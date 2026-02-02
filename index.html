@@ -127,32 +127,21 @@
       line-height: 1.6;
     }
 
-    /* Floating hearts (purple) */
+    /* Floating hearts (emoji 💜) */
     .heart{
       position:absolute;
-      width: 14px;
-      height: 14px;
-      transform: rotate(45deg);
-      opacity:.78;
+      opacity:.85;
       animation: floatUp linear forwards;
-      filter: drop-shadow(0 6px 8px rgba(0,0,0,.18));
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,.2));
+      user-select:none;
+      pointer-events:none;
+      will-change: transform, opacity;
     }
-    .heart::before,
-    .heart::after{
-      content:"";
-      position:absolute;
-      width: 14px;
-      height: 14px;
-      background: inherit;
-      border-radius: 50%;
-    }
-    .heart::before{ left:-7px; top:0; }
-    .heart::after{ left:0; top:-7px; }
 
     @keyframes floatUp{
-      0%   { transform: translateY(24px) rotate(45deg) scale(.95); opacity:0; }
-      12%  { opacity:.85; }
-      100% { transform: translateY(-120vh) rotate(45deg) scale(1.25); opacity:0; }
+      0%   { transform: translateY(24px) scale(.95); opacity:0; }
+      12%  { opacity:.9; }
+      100% { transform: translateY(-120vh) scale(1.25); opacity:0; }
     }
 
     /* Confetti burst */
@@ -208,144 +197,4 @@
     .modalText{
       margin:0 auto 14px;
       line-height:1.65;
-      color: rgba(0,0,0,.75);
-      max-width: 40ch;
-      font-size:14.5px;
-    }
-    .modalBtn{
-      width:100%;
-      border:0;
-      cursor:pointer;
-      padding:12px 14px;
-      border-radius:14px;
-      font-weight:800;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      color:#fff;
-      box-shadow: 0 14px 30px rgba(123,44,191,.30);
-    }
-    .modalBtn:active{ transform: translateY(2px); }
-  </style>
-</head>
-<body>
-  <div class="card" id="card">
-    <div class="burst" id="burst"></div>
-
-    <div class="badge">A little question for you 💜</div>
-
-    <h1>Will you be my Valentine? 💜</h1>
-
-    <p>
-      I wanted to ask you in a way that feels a little more special.
-      So I made this just for you.
-    </p>
-
-    <div class="buttons">
-      <button class="yes" id="yesBtn">Yes 💜</button>
-      <button class="no" id="noBtn">No</button>
-    </div>
-
-    <div class="message" id="msg">
-      You’re officially my Valentine 💜
-      <div class="tiny">Bisous Bisous</div>
-    </div>
-
-    <div class="tiny">Pick carefully.</div>
-  </div>
-
-  <!-- Cute popup modal for "No" -->
-  <div class="modalWrap" id="modalWrap" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-label="Try again">
-      <div class="modalTitle">Wrong answer 💜</div>
-      <p class="modalText">
-        That button is clearly broken.
-        Try the other one.
-      </p>
-      <button class="modalBtn" id="modalClose">Try again 💜</button>
-    </div>
-  </div>
-
-  <script>
-    const yesBtn = document.getElementById('yesBtn');
-    const noBtn  = document.getElementById('noBtn');
-    const msg    = document.getElementById('msg');
-    const burst  = document.getElementById('burst');
-    const card   = document.getElementById('card');
-
-    const modalWrap = document.getElementById('modalWrap');
-    const modalClose = document.getElementById('modalClose');
-
-    // Purple palette for hearts + sparks
-    const colors = ["#5a189a","#7b2cbf","#9d4edd","#c77dff","#e0aaff"];
-
-    // Floating hearts background
-    function spawnHeart(){
-      const h = document.createElement('div');
-      h.className = 'heart';
-      const size = 10 + Math.random()*16;
-      h.style.width = size + 'px';
-      h.style.height = size + 'px';
-      h.style.left = (Math.random()*100) + 'vw';
-      h.style.bottom = (-22 - Math.random()*70) + 'px';
-      h.style.background = colors[Math.floor(Math.random()*colors.length)];
-      const dur = 5 + Math.random()*4.5;
-      h.style.animationDuration = dur + 's';
-      document.body.appendChild(h);
-      setTimeout(()=>h.remove(), dur*1000);
-    }
-    setInterval(spawnHeart, 230);
-
-    // Confetti burst inside card
-    function confetti(x, y){
-      const rect = card.getBoundingClientRect();
-      const cx = x - rect.left;
-      const cy = y - rect.top;
-
-      for(let i=0;i<28;i++){
-        const s = document.createElement('div');
-        s.className = 'spark';
-        s.style.left = cx + 'px';
-        s.style.top  = cy + 'px';
-        s.style.background = colors[Math.floor(Math.random()*colors.length)];
-        const dx = (Math.random()*2-1) * (120 + Math.random()*140);
-        const dy = (Math.random()*2-1) * (120 + Math.random()*140);
-        s.style.setProperty('--dx', dx + 'px');
-        s.style.setProperty('--dy', dy + 'px');
-        burst.appendChild(s);
-        setTimeout(()=>s.remove(), 950);
-      }
-    }
-
-    // "Yes" action
-    yesBtn.addEventListener('click', (e) => {
-      msg.style.display = 'block';
-      confetti(e.clientX, e.clientY);
-      yesBtn.textContent = "Yes 💜";
-    });
-
-    // "No" action: cute popup only
-    function openModal(){
-      modalWrap.style.display = 'flex';
-      modalWrap.setAttribute('aria-hidden', 'false');
-    }
-    function closeModal(){
-      modalWrap.style.display = 'none';
-      modalWrap.setAttribute('aria-hidden', 'true');
-    }
-
-    noBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      openModal();
-    });
-
-    modalClose.addEventListener('click', closeModal);
-    modalWrap.addEventListener('click', (e) => {
-      if(e.target === modalWrap) closeModal();
-    });
-
-    // Escape key closes modal
-    document.addEventListener('keydown', (e) => {
-      if(e.key === 'Escape') closeModal();
-    });
-  </script>
-</body>
-</html>
+      color: rgba(0,0,0
